@@ -1,22 +1,24 @@
-import { DollarSign, Truck, PackageCheck } from "lucide-preact";
+import { DollarSign, Truck, Warehouse } from "lucide-preact";
 import Card from "../ui/Card";
 import { formatCurrency } from "../../lib/utils";
 
 interface SummaryCardsProps {
   monthTotal: number;
   enCamino: number;
-  recibidos: number;
+  enCourier: number;
+  quotedTotal: number;
 }
 
-export default function SummaryCards({ monthTotal, enCamino, recibidos }: SummaryCardsProps) {
+export default function SummaryCards({ monthTotal, enCamino, enCourier, quotedTotal }: SummaryCardsProps) {
   const items = [
     { label: "Gastado este mes", value: formatCurrency(monthTotal), icon: DollarSign },
     { label: "En camino", value: String(enCamino), icon: Truck },
-    { label: "Recibidos", value: String(recibidos), icon: PackageCheck },
+    { label: "En el courier", value: String(enCourier), icon: Warehouse },
+    { label: "Cotizado en envíos", value: formatCurrency(quotedTotal), icon: DollarSign },
   ];
 
   return (
-    <div class="grid gap-4 sm:grid-cols-3">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {items.map(({ label, value, icon: Icon }) => (
         <Card key={label} class="p-5">
           <div class="flex items-center gap-4">

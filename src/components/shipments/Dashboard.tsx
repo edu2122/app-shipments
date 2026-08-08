@@ -16,6 +16,7 @@ export default function Dashboard({ initialShipments }: DashboardProps) {
   const [shipments, setShipments] = useState<Shipment[]>(initialShipments);
   const [filter, setFilter] = useState<FilterValue>("todos");
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [editingShipment, setEditingShipment] = useState<Shipment | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +37,13 @@ export default function Dashboard({ initialShipments }: DashboardProps) {
     return {
       monthTotal,
       enCamino: shipments.filter((s) => s.status === "en_camino").length,
-      recibidos: shipments.filter((s) => s.status === "recibido").length,
+      enCourier: shipments.filter((s) =>
+        ["en_courier", "consolidacion_solicitada"].includes(s.status)
+      ).length,
+      quotedTotal: shipments.reduce(
+        (sum, s) => sum + Number(s.shipping_quote_usd ?? 0),
+        0
+      ),
     };
   }, [shipments]);
 
@@ -53,6 +60,27 @@ export default function Dashboard({ initialShipments }: DashboardProps) {
     }
 
     setShipments((prev) => [data, ...prev]);
+    setDialogOpen(false);
+  }
+
+  async function handleUpdate(values: ShipmentFormValues) {
+    if (!editingShipment) return;
+    setSubmitting(true);
+    setError(null);
+
+    const { data, error: actionError } = await actions.updateShipment({
+      id: editingShipment.id,
+      ...values,
+    });
+    setSubmitting(false);
+
+    if (actionError || !data) {
+      setError("No se pudieron guardar los cambios. Intenta de nuevo.");
+      return;
+    }
+
+    setShipments((prev) => prev.map((shipment) => (shipment.id === data.id ? data : shipment)));
+    setEditingShipment(null);
     setDialogOpen(false);
   }
 
@@ -90,7 +118,7 @@ export default function Dashboard({ initialShipments }: DashboardProps) {
           </h1>
           <p class="mt-1 text-sm text-text-muted">Amazon, Shein, Temu y más — de un vistazo.</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={() => { setEditingShipment(null); setDialogOpen(true); }}>
           <Plus class="h-4 w-4" strokeWidth={2.5} />
           Nuevo envío
         </Button>
@@ -99,20 +127,27 @@ export default function Dashboard({ initialShipments }: DashboardProps) {
       <SummaryCards
         monthTotal={summary.monthTotal}
         enCamino={summary.enCamino}
-        recibidos={summary.recibidos}
+        enCourier={summary.enCourier}
+        quotedTotal={summary.quotedTotal}
       />
 
       <FilterTabs value={filter} onChange={setFilter} />
 
       {error && <p class="text-sm font-medium text-danger">{error}</p>}
 
-      <ShipmentList shipments={filtered} onStatusChange={handleStatusChange} onDelete={handleDelete} />
+      <ShipmentList
+        shipments={filtered}
+        onStatusChange={handleStatusChange}
+        onEdit={(shipment) => { setEditingShipment(shipment); setDialogOpen(true); }}
+        onDelete={handleDelete}
+      />
 
       <ShipmentFormDialog
         open={isDialogOpen}
         submitting={isSubmitting}
-        onClose={() => setDialogOpen(false)}
-        onSubmit={handleCreate}
+        shipment={editingShipment}
+        onClose={() => { setDialogOpen(false); setEditingShipment(null); }}
+        onSubmit={editingShipment ? handleUpdate : handleCreate}
       />
     </div>
   );

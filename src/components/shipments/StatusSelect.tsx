@@ -9,6 +9,9 @@ interface StatusSelectProps {
 const toneByStatus: Record<Status, string> = {
   pendiente: "bg-warning/10 text-warning border-warning/20",
   en_camino: "bg-primary/10 text-primary border-primary/20",
+  en_courier: "bg-secondary/10 text-secondary border-secondary/20",
+  consolidacion_solicitada: "bg-warning/10 text-warning border-warning/20",
+  enviado_courier: "bg-primary/10 text-primary border-primary/20",
   recibido: "bg-success/10 text-success border-success/20",
 };
 

@@ -10,9 +10,7 @@ interface FilterTabsProps {
 
 const options: { value: FilterValue; label: string }[] = [
   { value: "todos", label: "Todos" },
-  { value: "pendiente", label: STATUS_LABELS.pendiente },
-  { value: "en_camino", label: STATUS_LABELS.en_camino },
-  { value: "recibido", label: STATUS_LABELS.recibido },
+  ...(Object.keys(STATUS_LABELS) as Status[]).map((value) => ({ value, label: STATUS_LABELS[value] })),
 ];
 
 export default function FilterTabs({ value, onChange }: FilterTabsProps) {
