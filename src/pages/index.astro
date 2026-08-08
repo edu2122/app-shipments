@@ -1,0 +1,43 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Dashboard from "../components/shipments/Dashboard";
+import ThemeToggle from "../components/ui/ThemeToggle.astro";
+import type { Shipment } from "../lib/types";
+
+const { supabase } = Astro.locals;
+
+const { data: shipments, error } = await supabase
+  .from("shipments")
+  .select("*")
+  .order("order_date", { ascending: false });
+
+if (error) {
+  console.error("Error loading shipments:", error.message);
+}
+---
+
+<Layout title="Mis Envíos">
+  <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    <div class="mb-6 flex items-center justify-end gap-2">
+      <ThemeToggle />
+      <button
+        id="logout-button"
+        type="button"
+        class="text-sm font-medium text-text-muted transition-colors hover:text-primary"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+    <Dashboard client:load initialShipments={(shipments ?? []) as Shipment[]} />
+  </main>
+</Layout>
+
+<script>
+  import { createClient } from "../lib/supabase/client";
+
+  const supabase = createClient();
+  document.getElementById("logout-button")?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  });
+</script>
