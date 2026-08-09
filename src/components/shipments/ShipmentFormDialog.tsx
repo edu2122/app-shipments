@@ -3,6 +3,8 @@ import { X } from "lucide-preact";
 import {
   STATUS_LABELS,
   STORE_LABELS,
+  ORIGIN_COUNTRY_LABELS,
+  type OriginCountry,
   type Shipment,
   type Status,
   type Store,
@@ -11,6 +13,7 @@ import { buttonClasses, cn, inputClasses, labelClasses } from "../../lib/utils";
 
 export interface ShipmentFormValues {
   store: Store;
+  originCountry: OriginCountry;
   trackingNumber: string;
   amountUsd: number;
   orderDate: string;
@@ -46,6 +49,7 @@ export default function ShipmentFormDialog({
 }: ShipmentFormDialogProps) {
   const [values, setValues] = useState<ShipmentFormValues>({
     store: "amazon",
+    originCountry: "estados_unidos",
     trackingNumber: "",
     amountUsd: 0,
     orderDate: today(),
@@ -66,6 +70,7 @@ export default function ShipmentFormDialog({
       shipment
         ? {
             store: shipment.store,
+            originCountry: shipment.origin_country,
             trackingNumber: shipment.tracking_number ?? "",
             amountUsd: Number(shipment.amount_usd),
             orderDate: shipment.order_date,
@@ -82,6 +87,7 @@ export default function ShipmentFormDialog({
           }
         : {
             store: "amazon",
+            originCountry: "estados_unidos",
             trackingNumber: "",
             amountUsd: 0,
             orderDate: today(),
@@ -144,6 +150,11 @@ export default function ShipmentFormDialog({
               </Field>
               <Field label="Fecha del pedido" id="order-date">
                 <input id="order-date" type="date" required class={cn(inputClasses(), "mt-1.5")} value={values.orderDate} onInput={(e) => set("orderDate", e.currentTarget.value)} />
+              </Field>
+              <Field label="País de origen" id="origin-country">
+                <select id="origin-country" class={cn(inputClasses(), "mt-1.5")} value={values.originCountry} onChange={(e) => set("originCountry", e.currentTarget.value as OriginCountry)}>
+                  {(Object.keys(ORIGIN_COUNTRY_LABELS) as OriginCountry[]).map((key) => <option key={key} value={key}>{ORIGIN_COUNTRY_LABELS[key]}</option>)}
+                </select>
               </Field>
               <Field label="Monto de la compra (USD)" id="amount">
                 <input id="amount" type="number" min="0" step="0.01" required class={cn(inputClasses(), "mt-1.5")} value={values.amountUsd || ""} onInput={(e) => set("amountUsd", Number(e.currentTarget.value))} placeholder="0.00" />

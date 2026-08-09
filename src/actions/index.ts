@@ -2,6 +2,7 @@ import { defineAction, ActionError } from "astro:actions";
 import { z } from "zod";
 
 const storeEnum = z.enum(["amazon", "shein", "temu", "otro"]);
+const originCountryEnum = z.enum(["estados_unidos", "espana"]);
 const statusEnum = z.enum([
   "pendiente",
   "en_camino",
@@ -14,6 +15,7 @@ const statusEnum = z.enum([
 const optionalText = z.string().trim().max(10000).optional();
 const shipmentInput = z.object({
   store: storeEnum,
+  originCountry: originCountryEnum,
   trackingNumber: z.string().trim().max(200).optional(),
   amountUsd: z.number().nonnegative(),
   orderDate: z.string(),
@@ -31,6 +33,7 @@ const shipmentInput = z.object({
 function toShipmentRow(input: z.infer<typeof shipmentInput>) {
   return {
     store: input.store,
+    origin_country: input.originCountry,
     tracking_number: input.trackingNumber || null,
     amount_usd: input.amountUsd,
     order_date: input.orderDate,

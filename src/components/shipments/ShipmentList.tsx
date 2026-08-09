@@ -1,5 +1,5 @@
 import { Mail, Pencil, ShieldCheck, Trash2 } from "lucide-preact";
-import { STORE_LABELS, type Shipment, type Status } from "../../lib/types";
+import { ORIGIN_COUNTRY_LABELS, STORE_LABELS, type Shipment, type Status } from "../../lib/types";
 import { formatCurrency, formatDate } from "../../lib/utils";
 import Card from "../ui/Card";
 import StatusSelect from "./StatusSelect";
@@ -30,6 +30,7 @@ export default function ShipmentList({ shipments, onStatusChange, onEdit, onDele
 
               <div class="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
                 <Detail label="Compra" value={formatCurrency(Number(shipment.amount_usd))} />
+                <Detail label="Origen" value={ORIGIN_COUNTRY_LABELS[shipment.origin_country]} />
                 <Detail label="Tracking" value={shipment.tracking_number || "Sin registrar"} mono />
                 <Detail label="Transportista" value={shipment.shipping_carrier || "Sin registrar"} />
                 {shipment.courier_received_at && <Detail label="Llegó al courier" value={formatDate(shipment.courier_received_at)} />}

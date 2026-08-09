@@ -1,4 +1,5 @@
 export type Store = "amazon" | "shein" | "temu" | "otro";
+export type OriginCountry = "estados_unidos" | "espana";
 export type Status =
   | "pendiente"
   | "en_camino"
@@ -10,6 +11,7 @@ export type Status =
 export interface Shipment {
   id: string;
   store: Store;
+  origin_country: OriginCountry;
   tracking_number: string | null;
   amount_usd: number;
   order_date: string;
@@ -31,6 +33,11 @@ export const STORE_LABELS: Record<Store, string> = {
   shein: "Shein",
   temu: "Temu",
   otro: "Otro",
+};
+
+export const ORIGIN_COUNTRY_LABELS: Record<OriginCountry, string> = {
+  estados_unidos: "Estados Unidos",
+  espana: "España",
 };
 
 export const STATUS_LABELS: Record<Status, string> = {
