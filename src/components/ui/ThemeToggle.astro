@@ -1,10 +1,12 @@
 <button
   id="theme-toggle"
   type="button"
-  aria-label="Cambiar tema"
-  class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:hover:bg-slate-800"
+  aria-label="Activar tema oscuro"
+  aria-pressed="false"
+  class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 >
   <svg
+    aria-hidden="true"
     class="h-5 w-5 dark:hidden"
     viewBox="0 0 24 24"
     fill="none"
@@ -16,6 +18,7 @@
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
   </svg>
   <svg
+    aria-hidden="true"
     class="hidden h-5 w-5 dark:block"
     viewBox="0 0 24 24"
     fill="none"
@@ -34,8 +37,17 @@
   const STORAGE_KEY = "theme";
   const button = document.getElementById("theme-toggle");
 
+  function syncLabel() {
+    const isDark = document.documentElement.classList.contains("dark");
+    button?.setAttribute("aria-pressed", String(isDark));
+    button?.setAttribute("aria-label", isDark ? "Activar tema claro" : "Activar tema oscuro");
+  }
+
+  syncLabel();
+
   button?.addEventListener("click", () => {
     const isDark = document.documentElement.classList.toggle("dark");
     localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+    syncLabel();
   });
 </script>

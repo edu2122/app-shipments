@@ -2,6 +2,7 @@ import { STATUS_LABELS, type Status } from "../../lib/types";
 import { cn } from "../../lib/utils";
 
 interface StatusSelectProps {
+  label?: string;
   value: Status;
   onChange: (value: Status) => void;
 }
@@ -15,12 +16,12 @@ const toneByStatus: Record<Status, string> = {
   recibido: "bg-success/10 text-success border-success/20",
 };
 
-export default function StatusSelect({ value, onChange }: StatusSelectProps) {
+export default function StatusSelect({ label = "Cambiar estado del envío", value, onChange }: StatusSelectProps) {
   return (
     <select
       value={value}
       onChange={(e) => onChange((e.target as HTMLSelectElement).value as Status)}
-      aria-label="Cambiar estado del envío"
+      aria-label={label}
       class={cn(
         "cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background",
         toneByStatus[value]

@@ -22,12 +22,12 @@ export default function SummaryCards({ monthTotal, enCamino, enCourier, quotedTo
       {items.map(({ label, value, icon: Icon }) => (
         <Card key={label} class="p-5">
           <div class="flex items-center gap-4">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Icon class="h-6 w-6" strokeWidth={2} />
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
+              <Icon aria-hidden="true" class="h-5 w-5" strokeWidth={2} />
             </div>
             <div>
               <p class="text-sm font-medium text-text-muted">{label}</p>
-              <p class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-2xl font-extrabold text-transparent">
+              <p class="font-display text-2xl font-bold text-text-main">
                 {value}
               </p>
             </div>

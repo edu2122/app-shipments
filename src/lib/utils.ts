@@ -21,7 +21,7 @@ export function buttonClasses(variant: "primary" | "secondary" = "primary"): str
 
 export function cardClasses(interactive = false): string {
   return cn(
-    "rounded-xl border border-slate-100 bg-surface shadow-soft transition-all duration-200 dark:border-slate-800",
+    "rounded-2xl border border-border bg-surface shadow-soft transition-all duration-200",
     interactive && "hover:-translate-y-1 hover:shadow-soft-hover"
   );
 }

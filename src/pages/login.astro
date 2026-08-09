@@ -5,12 +5,14 @@ import { inputClasses, labelClasses, buttonClasses, cardClasses } from "../lib/u
 ---
 
 <Layout title="Iniciar sesión — Mis Envíos">
-  <main class="relative flex min-h-screen items-center justify-center px-4">
+  <main id="main-content" class="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+    <div aria-hidden="true" class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,color-mix(in_srgb,var(--color-primary)_16%,transparent),transparent_34%),radial-gradient(circle_at_80%_75%,color-mix(in_srgb,var(--color-accent)_13%,transparent),transparent_30%)]"></div>
     <div class="absolute right-4 top-4">
       <ThemeToggle />
     </div>
-    <div class={`${cardClasses()} w-full max-w-sm p-8`}>
-      <h1 class="text-2xl font-extrabold tracking-tight text-text-main">Mis Envíos</h1>
+    <div class={`${cardClasses()} relative w-full max-w-sm p-8`}>
+      <p class="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-primary">Tu centro logístico</p>
+      <h1 class="font-display text-3xl font-bold tracking-tight text-text-main">Mis Envíos</h1>
       <p class="mt-2 text-sm text-text-muted">
         Te enviamos un enlace mágico a tu correo para entrar, sin contraseñas.
       </p>
@@ -61,7 +63,10 @@ import { inputClasses, labelClasses, buttonClasses, cardClasses } from "../lib/u
     submitButton.disabled = false;
 
     if (error) {
-      message.textContent = "No se pudo enviar el enlace. Intenta de nuevo.";
+      const isRateLimited = error.status === 429 || error.code === "over_email_send_rate_limit" || error.code === "over_request_rate_limit";
+      message.textContent = isRateLimited
+        ? "Espera un minuto antes de solicitar otro enlace."
+        : "No se pudo enviar el enlace. Intenta de nuevo.";
       message.className = "mt-4 text-sm text-danger";
     } else {
       message.textContent = "Revisa tu correo y haz clic en el enlace para entrar.";

@@ -3,24 +3,26 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
 
-  --color-background: #f8fafc;
-  --color-surface: #ffffff;
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-secondary: #7c3aed;
-  --color-text-main: #0f172a;
-  --color-text-muted: #64748b;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-border: #e2e8f0;
+  --color-background: #f3f6f4;
+  --color-surface: #fffefd;
+  --color-primary: #0b6b66;
+  --color-primary-hover: #075b57;
+  --color-secondary: #164e63;
+  --color-accent: #e8782e;
+  --color-text-main: #112726;
+  --color-text-muted: #5c706e;
+  --color-success: #087f5b;
+  --color-warning: #b45309;
+  --color-danger: #c2413a;
+  --color-border: #dce5e1;
 
-  --shadow-soft: 0 4px 20px -2px rgba(79, 70, 229, 0.1);
+  --shadow-soft: 0 12px 35px -22px rgba(17, 39, 38, 0.38);
   --shadow-soft-hover:
-    0 10px 25px -5px rgba(79, 70, 229, 0.15), 0 8px 10px -6px rgba(79, 70, 229, 0.1);
-  --shadow-button: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+    0 24px 48px -26px rgba(17, 39, 38, 0.5), 0 10px 20px -16px rgba(11, 107, 102, 0.32);
+  --shadow-button: 0 8px 20px -8px rgba(11, 107, 102, 0.65);
 }
 
 /* Dark mode: same token names, repainted values. Components that use the
@@ -29,20 +31,21 @@
 :root.dark {
   --color-background: #020617;
   --color-surface: #0f172a;
-  --color-primary: #818cf8;
-  --color-primary-hover: #6366f1;
-  --color-secondary: #a78bfa;
+  --color-primary: #45c7bb;
+  --color-primary-hover: #69d6cc;
+  --color-secondary: #67c6df;
+  --color-accent: #fb923c;
   --color-text-main: #f1f5f9;
   --color-text-muted: #94a3b8;
-  --color-success: #34d399;
+  --color-success: #5ee0aa;
   --color-warning: #fbbf24;
   --color-danger: #f87171;
   --color-border: #1e293b;
 
-  --shadow-soft: 0 4px 20px -2px rgba(99, 102, 241, 0.25);
+  --shadow-soft: 0 14px 38px -22px rgba(69, 199, 187, 0.3);
   --shadow-soft-hover:
-    0 10px 25px -5px rgba(167, 139, 250, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.25);
-  --shadow-button: 0 4px 14px 0 rgba(99, 102, 241, 0.45);
+    0 24px 48px -26px rgba(69, 199, 187, 0.45), 0 10px 20px -16px rgba(103, 198, 223, 0.35);
+  --shadow-button: 0 8px 20px -8px rgba(69, 199, 187, 0.55);
 }
 
 @layer base {
@@ -50,7 +53,13 @@
     background-color: var(--color-background);
     color: var(--color-text-main);
     font-family: var(--font-sans);
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--color-primary) 3%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-primary) 3%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
+
+  .font-display { font-family: var(--font-display); }
 
   html.dark {
     color-scheme: dark;
@@ -58,5 +67,16 @@
 
   html:not(.dark) {
     color-scheme: light;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

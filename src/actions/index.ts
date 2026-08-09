@@ -1,8 +1,7 @@
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "zod";
+import { shipmentInputSchema, type ShipmentInput } from "../lib/shipment-schema";
 
-const storeEnum = z.enum(["amazon", "shein", "temu", "otro"]);
-const originCountryEnum = z.enum(["estados_unidos", "espana"]);
 const statusEnum = z.enum([
   "pendiente",
   "en_camino",
@@ -12,25 +11,7 @@ const statusEnum = z.enum([
   "recibido",
 ]);
 
-const optionalText = z.string().trim().max(10000).optional();
-const shipmentInput = z.object({
-  store: storeEnum,
-  originCountry: originCountryEnum,
-  trackingNumber: z.string().trim().max(200).optional(),
-  amountUsd: z.number().nonnegative(),
-  orderDate: z.string(),
-  status: statusEnum,
-  shippingCarrier: z.string().trim().max(200).optional(),
-  courierPrealerted: z.boolean(),
-  courierPrealertedAt: z.string().optional(),
-  courierReceivedAt: z.string().optional(),
-  consolidationRequestedAt: z.string().optional(),
-  shippingQuoteUsd: z.number().nonnegative().nullable(),
-  emailDetails: optionalText,
-  notes: optionalText,
-});
-
-function toShipmentRow(input: z.infer<typeof shipmentInput>) {
+function toShipmentRow(input: ShipmentInput) {
   return {
     store: input.store,
     origin_country: input.originCountry,
@@ -51,7 +32,7 @@ function toShipmentRow(input: z.infer<typeof shipmentInput>) {
 
 export const server = {
   createShipment: defineAction({
-    input: shipmentInput,
+    input: shipmentInputSchema,
     handler: async (input, context) => {
       const { supabase, user } = context.locals;
       if (!user) throw new ActionError({ code: "UNAUTHORIZED" });
@@ -73,15 +54,16 @@ export const server = {
   }),
 
   updateShipment: defineAction({
-    input: shipmentInput.extend({ id: z.string().uuid() }),
-    handler: async ({ id, ...input }, context) => {
+    input: z.object({ id: z.string().uuid(), shipment: shipmentInputSchema }).strict(),
+    handler: async ({ id, shipment }, context) => {
       const { supabase, user } = context.locals;
       if (!user) throw new ActionError({ code: "UNAUTHORIZED" });
 
       const { data, error } = await supabase
         .from("shipments")
-        .update(toShipmentRow(input))
+        .update(toShipmentRow(shipment))
         .eq("id", id)
+        .eq("user_id", user.id)
         .select()
         .single();
 
@@ -105,6 +87,7 @@ export const server = {
         .from("shipments")
         .update({ status })
         .eq("id", id)
+        .eq("user_id", user.id)
         .select()
         .single();
 
@@ -121,7 +104,11 @@ export const server = {
       const { supabase, user } = context.locals;
       if (!user) throw new ActionError({ code: "UNAUTHORIZED" });
 
-      const { error } = await supabase.from("shipments").delete().eq("id", id);
+      const { error } = await supabase
+        .from("shipments")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
       if (error) {
         throw new ActionError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
       }

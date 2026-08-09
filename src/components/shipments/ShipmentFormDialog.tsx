@@ -1,4 +1,5 @@
-import { useEffect, useState } from "preact/hooks";
+import type { ComponentChildren } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { X } from "lucide-preact";
 import {
   STATUS_LABELS,
@@ -32,6 +33,7 @@ interface ShipmentFormDialogProps {
   open: boolean;
   submitting: boolean;
   shipment?: Shipment | null;
+  error?: string | null;
   onClose: () => void;
   onSubmit: (values: ShipmentFormValues) => void;
 }
@@ -44,9 +46,12 @@ export default function ShipmentFormDialog({
   open,
   submitting,
   shipment,
+  error,
   onClose,
   onSubmit,
 }: ShipmentFormDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [values, setValues] = useState<ShipmentFormValues>({
     store: "amazon",
     originCountry: "estados_unidos",
@@ -106,10 +111,37 @@ export default function ShipmentFormDialog({
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
     }
-    if (open) document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKey);
+    window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -125,21 +157,22 @@ export default function ShipmentFormDialog({
   }
 
   return (
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm">
-      <div class="max-h-full w-full max-w-2xl overflow-y-auto rounded-xl border border-slate-100 bg-surface p-6 shadow-soft-hover dark:border-slate-800">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-3 py-4 backdrop-blur-sm sm:px-4 sm:py-6">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="shipment-dialog-title" aria-describedby="shipment-dialog-description" class="max-h-full w-full max-w-2xl overflow-y-auto rounded-[1.5rem] border border-border bg-surface p-5 shadow-2xl sm:p-7">
         <div class="mb-5 flex items-center justify-between">
           <div>
-            <h2 class="text-lg font-bold text-text-main">
+            <h2 id="shipment-dialog-title" class="font-display text-2xl font-bold text-text-main">
               {shipment ? "Actualizar pedido" : "Nuevo pedido"}
             </h2>
-            <p class="text-xs text-text-muted">Completa ahora lo que tengas y actualízalo después.</p>
+            <p id="shipment-dialog-description" class="mt-1 text-xs text-text-muted">Completa ahora lo que tengas y actualízalo después.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Cerrar" class="rounded-lg p-1.5 text-text-muted hover:bg-slate-50 dark:hover:bg-slate-800">
-            <X class="h-5 w-5" />
+          <button ref={closeButtonRef} type="button" onClick={onClose} aria-label="Cerrar formulario" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl text-text-muted hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            <X aria-hidden="true" class="h-5 w-5" />
           </button>
         </div>
 
-        <form class="space-y-6" onSubmit={handleSubmit}>
+        <form class="space-y-6" onSubmit={handleSubmit} aria-busy={submitting}>
+          {error && <p role="alert" class="rounded-xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">{error}</p>}
           <section>
             <h3 class="mb-3 text-sm font-bold text-primary">Datos del pedido</h3>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -205,6 +238,6 @@ export default function ShipmentFormDialog({
   );
 }
 
-function Field({ label, id, children }: { label: string; id: string; children: preact.ComponentChildren }) {
+function Field({ label, id, children }: { label: string; id: string; children: ComponentChildren }) {
   return <div><label class={labelClasses()} for={id}>{label}</label>{children}</div>;
 }

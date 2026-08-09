@@ -25,13 +25,15 @@ const { title = "Mis Envíos" } = Astro.props;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <meta name="theme-color" content="#0b6b66" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
   <body class="min-h-screen bg-background text-text-main antialiased">
+    <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-text-main px-4 py-2 text-sm font-semibold text-surface shadow-lg transition-transform focus:translate-y-0">Saltar al contenido principal</a>
     <slot />
   </body>
 </html>
